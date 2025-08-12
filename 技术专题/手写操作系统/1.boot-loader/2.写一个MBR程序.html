@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-rc.18" />
+    <meta name="theme" content="VuePress Theme Hope 2.0.0-rc.50" />
+    <style>
+      html {
+        background: var(--bg-color, #fff);
+      }
+
+      html[data-theme="dark"] {
+        background: var(--bg-color, #1d1e1f);
+      }
+
+      body {
+        background: var(--bg-color);
+      }
+    </style>
+    <script>
+      const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+      const systemDarkMode =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+    <meta property="og:url" content="https://noahyz.github.io/%E6%8A%80%E6%9C%AF%E4%B8%93%E9%A2%98/%E6%89%8B%E5%86%99%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/1.boot-loader/2.%E5%86%99%E4%B8%80%E4%B8%AAMBR%E7%A8%8B%E5%BA%8F.html"><meta property="og:site_name" content="noahyz的博客"><meta property="og:title" content="2.写一个 MBR 程序"><meta property="og:description" content="写一个 MBR 程序 我们先来贴出程序，然后再来解释。如下这段代码的功能是在屏幕上打印字符串 "1 MBR"。背景色为黑色，前景色为绿色。 1. section 相关 section 是伪指令，是 nasm 提供的。CPU 运行程序是不需要这个东西的，section 只是用来给程序员规划程序用的，逻辑上划分成段的好处就是方便开发人员梳理代码，方便管理。..."><meta property="og:type" content="article"><meta property="og:locale" content="zh-CN"><meta property="article:author" content="noahyz"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"2.写一个 MBR 程序","image":[""],"dateModified":null,"author":[{"@type":"Person","name":"noahyz","url":"/about-the-author/"}]}</script><meta name="robots" content="all"><meta name="author" content="noahyz"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="keywords" content="Java, Java基础, 并发编程, JVM, 虚拟机, 数据库, MySQL, Spring, Redis, MyBatis, SpringBoot, IDEA, 求职面试, 面渣逆袭, 学习路线"><meta name="apple-mobile-web-app-capable" content="yes"><script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?5230ac143650bf5eb3c14f3fb9b1d3ec";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+      </script><script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?59aa453e7e706422c636c079fc1cb031";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+      </script><link rel="stylesheet" href="//at.alicdn.com/t/font_3180624_7cy10l7jqqh.css"><link rel="icon" href="/logo2.ico"><link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials"><meta name="theme-color" content="#096dd9"><title>2.写一个 MBR 程序 | noahyz的博客</title><meta name="description" content="写一个 MBR 程序 我们先来贴出程序，然后再来解释。如下这段代码的功能是在屏幕上打印字符串 "1 MBR"。背景色为黑色，前景色为绿色。 1. section 相关 section 是伪指令，是 nasm 提供的。CPU 运行程序是不需要这个东西的，section 只是用来给程序员规划程序用的，逻辑上划分成段的好处就是方便开发人员梳理代码，方便管理。...">
+    <link rel="preload" href="/assets/style-D4RaGlXo.css" as="style"><link rel="stylesheet" href="/assets/style-D4RaGlXo.css">
+    <link rel="modulepreload" href="/assets/app-D1zlwylF.js"><link rel="modulepreload" href="/assets/2.写一个MBR程序.html-M4-uDCFA.js"><link rel="modulepreload" href="/assets/plugin-vue_export-helper-DlAUqK2U.js">
+    
+  </head>
+  <body>
+    <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content" class="vp-skip-link sr-only">跳至主要內容</a><!--]--><div class="theme-container external-link-icon has-toc"><!--[--><header id="navbar" class="vp-navbar"><div class="vp-navbar-start"><button type="button" class="vp-toggle-sidebar-button" title="Toggle Sidebar"><span class="icon"></span></button><!----><!--[--><a class="route-link vp-brand" href="/"><img class="vp-nav-logo" src="/./logo.png" alt><!----><span class="vp-site-name hide-in-pad">noahyz的博客</span></a><!--]--><!----></div><div class="vp-navbar-center"><!----><!--[--><nav class="vp-nav-links"><div class="vp-nav-item hide-in-mobile"><a class="route-link auto-link" href="/" aria-label="知识库"><!--[--><span class="font-icon icon iconfont icon-lujing" style=""></span><!--]-->知识库<!----></a></div></nav><!--]--><!----></div><div class="vp-navbar-end"><!----><!--[--><!----><!----><div class="vp-nav-item hide-in-mobile"><button type="button" class="vp-outlook-button" tabindex="-1" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="icon outlook-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="outlook icon" name="outlook"><path d="M224 800c0 9.6 3.2 44.8 6.4 54.4 6.4 48-48 76.8-48 76.8s80 41.6 147.2 0 134.4-134.4 38.4-195.2c-22.4-12.8-41.6-19.2-57.6-19.2C259.2 716.8 227.2 761.6 224 800zM560 675.2l-32 51.2c-51.2 51.2-83.2 32-83.2 32 25.6 67.2 0 112-12.8 128 25.6 6.4 51.2 9.6 80 9.6 54.4 0 102.4-9.6 150.4-32l0 0c3.2 0 3.2-3.2 3.2-3.2 22.4-16 12.8-35.2 6.4-44.8-9.6-12.8-12.8-25.6-12.8-41.6 0-54.4 60.8-99.2 137.6-99.2 6.4 0 12.8 0 22.4 0 12.8 0 38.4 9.6 48-25.6 0-3.2 0-3.2 3.2-6.4 0-3.2 3.2-6.4 3.2-6.4 6.4-16 6.4-16 6.4-19.2 9.6-35.2 16-73.6 16-115.2 0-105.6-41.6-198.4-108.8-268.8C704 396.8 560 675.2 560 675.2zM224 419.2c0-28.8 22.4-51.2 51.2-51.2 28.8 0 51.2 22.4 51.2 51.2 0 28.8-22.4 51.2-51.2 51.2C246.4 470.4 224 448 224 419.2zM320 284.8c0-22.4 19.2-41.6 41.6-41.6 22.4 0 41.6 19.2 41.6 41.6 0 22.4-19.2 41.6-41.6 41.6C339.2 326.4 320 307.2 320 284.8zM457.6 208c0-12.8 12.8-25.6 25.6-25.6 12.8 0 25.6 12.8 25.6 25.6 0 12.8-12.8 25.6-25.6 25.6C470.4 233.6 457.6 220.8 457.6 208zM128 505.6C128 592 153.6 672 201.6 736c28.8-60.8 112-60.8 124.8-60.8-16-51.2 16-99.2 16-99.2l316.8-422.4c-48-19.2-99.2-32-150.4-32C297.6 118.4 128 291.2 128 505.6zM764.8 86.4c-22.4 19.2-390.4 518.4-390.4 518.4-22.4 28.8-12.8 76.8 22.4 99.2l9.6 6.4c35.2 22.4 80 12.8 99.2-25.6 0 0 6.4-12.8 9.6-19.2 54.4-105.6 275.2-524.8 288-553.6 6.4-19.2-3.2-32-19.2-32C777.6 76.8 771.2 80 764.8 86.4z"></path></svg><div class="vp-outlook-dropdown"><!----></div></button></div><!--[--><button type="button" class="slimsearch-button" aria-label="搜索"><svg xmlns="http://www.w3.org/2000/svg" class="icon search-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="search icon"><path d="M192 480a256 256 0 1 1 512 0 256 256 0 0 1-512 0m631.776 362.496-143.2-143.168A318.464 318.464 0 0 0 768 480c0-176.736-143.264-320-320-320S128 303.264 128 480s143.264 320 320 320a318.016 318.016 0 0 0 184.16-58.592l146.336 146.368c12.512 12.48 32.768 12.48 45.28 0 12.48-12.512 12.48-32.768 0-45.28"></path></svg><div class="slimsearch-placeholder">搜索</div><div class="slimsearch-key-hints"><kbd class="slimsearch-key">Ctrl</kbd><kbd class="slimsearch-key">K</kbd></div></button><!--]--><!--]--><!----><button type="button" class="vp-toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false" aria-controls="nav-screen"><span><span class="vp-top"></span><span class="vp-middle"></span><span class="vp-bottom"></span></span></button></div></header><!----><!--]--><!----><div class="toggle-sidebar-wrapper"><span class="arrow start"></span></div><aside id="sidebar" class="vp-sidebar"><!----><ul class="vp-sidebar-links"><li><section class="vp-sidebar-group"><button class="vp-sidebar-header clickable" type="button"><!----><span class="vp-sidebar-title">编程语言</span><span class="vp-arrow end"></span></button><!----></section></li><li><section class="vp-sidebar-group"><button class="vp-sidebar-header clickable" type="button"><!----><span class="vp-sidebar-title">操作系统</span><span class="vp-arrow end"></span></button><!----></section></li><li><section class="vp-sidebar-group"><button class="vp-sidebar-header clickable" type="button"><!----><span class="vp-sidebar-title">计算机网络</span><span class="vp-arrow end"></span></button><!----></section></li><li><section class="vp-sidebar-group"><button class="vp-sidebar-header clickable" type="button"><!----><span class="vp-sidebar-title">技术专题</span><span class="vp-arrow end"></span></button><!----></section></li><li><section class="vp-sidebar-group"><button class="vp-sidebar-header clickable" type="button"><!----><span class="vp-sidebar-title">架构框架</span><span class="vp-arrow end"></span></button><!----></section></li><li><section class="vp-sidebar-group"><button class="vp-sidebar-header clickable" type="button"><!----><span class="vp-sidebar-title">分布式</span><span class="vp-arrow end"></span></button><!----></section></li></ul><!----></aside><!--[--><main id="main-content" class="vp-page"><!--[--><!----><!----><nav class="vp-breadcrumb disable"></nav><div class="vp-page-title"><h1><!---->2.写一个 MBR 程序</h1><div class="page-info"><span class="page-author-info" aria-label="作者🖊" data-balloon-pos="up"><svg xmlns="http://www.w3.org/2000/svg" class="icon author-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="author icon" name="author"><path d="M649.6 633.6c86.4-48 147.2-144 147.2-249.6 0-160-128-288-288-288s-288 128-288 288c0 108.8 57.6 201.6 147.2 249.6-121.6 48-214.4 153.6-240 288-3.2 9.6 0 19.2 6.4 25.6 3.2 9.6 12.8 12.8 22.4 12.8h704c9.6 0 19.2-3.2 25.6-12.8 6.4-6.4 9.6-16 6.4-25.6-25.6-134.4-121.6-240-243.2-288z"></path></svg><span><a class="page-author-item" href="/about-the-author/" target="_blank" rel="noopener noreferrer">noahyz</a></span><span property="author" content="noahyz"></span></span><!----><!----><!----><!----><span class="page-word-info" aria-label="字数🔠" data-balloon-pos="up"><svg xmlns="http://www.w3.org/2000/svg" class="icon word-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="word icon" name="word"><path d="M518.217 432.64V73.143A73.143 73.143 0 01603.43 1.097a512 512 0 01419.474 419.474 73.143 73.143 0 01-72.046 85.212H591.36a73.143 73.143 0 01-73.143-73.143z"></path><path d="M493.714 566.857h340.297a73.143 73.143 0 0173.143 85.577A457.143 457.143 0 11371.566 117.76a73.143 73.143 0 0185.577 73.143v339.383a36.571 36.571 0 0036.571 36.571z"></path></svg><span>约 1288 字</span><meta property="wordCount" content="1288"></span><span class="page-reading-time-info" aria-label="阅读时间⌛" data-balloon-pos="up"><svg xmlns="http://www.w3.org/2000/svg" class="icon timer-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="timer icon" name="timer"><path d="M799.387 122.15c4.402-2.978 7.38-7.897 7.38-13.463v-1.165c0-8.933-7.38-16.312-16.312-16.312H256.33c-8.933 0-16.311 7.38-16.311 16.312v1.165c0 5.825 2.977 10.874 7.637 13.592 4.143 194.44 97.22 354.963 220.201 392.763-122.204 37.542-214.893 196.511-220.2 389.397-4.661 5.049-7.638 11.651-7.638 19.03v5.825h566.49v-5.825c0-7.379-2.849-13.981-7.509-18.9-5.049-193.016-97.867-351.985-220.2-389.527 123.24-37.67 216.446-198.453 220.588-392.892zM531.16 450.445v352.632c117.674 1.553 211.787 40.778 211.787 88.676H304.097c0-48.286 95.149-87.382 213.728-88.676V450.445c-93.077-3.107-167.901-81.297-167.901-177.093 0-8.803 6.99-15.793 15.793-15.793 8.803 0 15.794 6.99 15.794 15.793 0 80.261 63.69 145.635 142.01 145.635s142.011-65.374 142.011-145.635c0-8.803 6.99-15.793 15.794-15.793s15.793 6.99 15.793 15.793c0 95.019-73.789 172.82-165.96 177.093z"></path></svg><span>大约 4 分钟</span><meta property="timeRequired" content="PT4M"></span></div><hr></div><div class="vp-toc-placeholder"><aside id="toc"><!----><div class="vp-toc-header">此页内容<button type="button" class="print-button" title="打印"><svg xmlns="http://www.w3.org/2000/svg" class="icon print-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="print icon" name="print"><path d="M819.2 364.8h-44.8V128c0-17.067-14.933-32-32-32H281.6c-17.067 0-32 14.933-32 32v236.8h-44.8C145.067 364.8 96 413.867 96 473.6v192c0 59.733 49.067 108.8 108.8 108.8h44.8V896c0 17.067 14.933 32 32 32h460.8c17.067 0 32-14.933 32-32V774.4h44.8c59.733 0 108.8-49.067 108.8-108.8v-192c0-59.733-49.067-108.8-108.8-108.8zM313.6 160h396.8v204.8H313.6V160zm396.8 704H313.6V620.8h396.8V864zM864 665.6c0 25.6-19.2 44.8-44.8 44.8h-44.8V588.8c0-17.067-14.933-32-32-32H281.6c-17.067 0-32 14.933-32 32v121.6h-44.8c-25.6 0-44.8-19.2-44.8-44.8v-192c0-25.6 19.2-44.8 44.8-44.8h614.4c25.6 0 44.8 19.2 44.8 44.8v192z"></path></svg></button><div class="arrow end"></div></div><div class="vp-toc-wrapper"><ul class="vp-toc-list"><!--[--><li class="vp-toc-item"><a class="route-link vp-toc-link level2" href="#写一个-mbr-程序">写一个 MBR 程序</a></li><!----><!--]--></ul><div class="vp-toc-marker" style="top:-1.7rem;"></div></div><!----></aside></div><!----><div class="theme-hope-content"><h2 id="写一个-mbr-程序" tabindex="-1"><a class="header-anchor" href="#写一个-mbr-程序"><span>写一个 MBR 程序</span></a></h2><p>我们先来贴出程序，然后再来解释。如下这段代码的功能是在屏幕上打印字符串 &quot;1 MBR&quot;。背景色为黑色，前景色为绿色。</p><div class="language- line-numbers-mode" data-highlighter="shiki" data-ext="" data-title="" style="--shiki-light:#24292e;--shiki-dark:#abb2bf;--shiki-light-bg:#fff;--shiki-dark-bg:#282c34;"><pre class="shiki shiki-themes github-light one-dark-pro vp-code"><code><span class="line"><span>;主引导程序 </span></span>
+<span class="line"><span>;------------------------------------------------------------</span></span>
+<span class="line"><span>SECTION MBR vstart=0x7c00         </span></span>
+<span class="line"><span>   mov ax,cs      </span></span>
+<span class="line"><span>   mov ds,ax</span></span>
+<span class="line"><span>   mov es,ax</span></span>
+<span class="line"><span>   mov ss,ax</span></span>
+<span class="line"><span>   mov fs,ax</span></span>
+<span class="line"><span>   mov sp,0x7c00</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>; 清屏 利用0x06号功能，上卷全部行，则可清屏。</span></span>
+<span class="line"><span>; -----------------------------------------------------------</span></span>
+<span class="line"><span>;INT 0x10   功能号:0x06	   功能描述:上卷窗口</span></span>
+<span class="line"><span>;------------------------------------------------------</span></span>
+<span class="line"><span>;输入：</span></span>
+<span class="line"><span>;AH 功能号= 0x06</span></span>
+<span class="line"><span>;AL = 上卷的行数(如果为0,表示全部)</span></span>
+<span class="line"><span>;BH = 上卷行属性</span></span>
+<span class="line"><span>;(CL,CH) = 窗口左上角的(X,Y)位置</span></span>
+<span class="line"><span>;(DL,DH) = 窗口右下角的(X,Y)位置</span></span>
+<span class="line"><span>;无返回值：</span></span>
+<span class="line"><span>   mov     ax, 0x600</span></span>
+<span class="line"><span>   mov     bx, 0x700</span></span>
+<span class="line"><span>   mov     cx, 0           ; 左上角: (0, 0)</span></span>
+<span class="line"><span>   mov     dx, 0x184f	   ; 右下角: (80,25),</span></span>
+<span class="line"><span>			   ; VGA文本模式中,一行只能容纳80个字符,共25行。</span></span>
+<span class="line"><span>			   ; 下标从0开始,所以0x18=24,0x4f=79</span></span>
+<span class="line"><span>   int     0x10            ; int 0x10</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;;;;;;;;;    下面这三行代码是获取光标位置    ;;;;;;;;;</span></span>
+<span class="line"><span>;.get_cursor获取当前光标位置,在光标位置处打印字符.</span></span>
+<span class="line"><span>   mov ah, 3		; 输入: 3号子功能是获取光标位置,需要存入ah寄存器</span></span>
+<span class="line"><span>   mov bh, 0		; bh寄存器存储的是待获取光标的页号</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>   int 0x10		; 输出: ch=光标开始行,cl=光标结束行</span></span>
+<span class="line"><span>							; dh=光标所在行号,dl=光标所在列号</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;;;;;;;;;    获取光标位置结束    ;;;;;;;;;;;;;;;;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>;;;;;;;;;     打印字符串    ;;;;;;;;;;;</span></span>
+<span class="line"><span>   ;还是用10h中断,不过这次是调用13号子功能打印字符串</span></span>
+<span class="line"><span>   mov ax, message </span></span>
+<span class="line"><span>   mov bp, ax		; es:bp 为串首地址, es此时同cs一致，</span></span>
+<span class="line"><span>								; 开头时已经为sreg初始化</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>   ; 光标位置要用到dx寄存器中内容,cx中的光标位置可忽略</span></span>
+<span class="line"><span>   mov cx, 5			; cx 为串长度,不包括结束符0的字符个数</span></span>
+<span class="line"><span>   mov ax, 0x1301	; 子功能号13是显示字符及属性,要存入ah寄存器,</span></span>
+<span class="line"><span>									; al设置写字符方式 ah=01: 显示字符串,光标跟随移动</span></span>
+<span class="line"><span>   mov bx, 0x2		; bh存储要显示的页号,此处是第0页,</span></span>
+<span class="line"><span>									; bl中是字符属性, 属性黑底绿字(bl = 02h)</span></span>
+<span class="line"><span>   int 0x10				; 执行BIOS 0x10 号中断</span></span>
+<span class="line"><span>;;;;;;;;;      打字字符串结束	 ;;;;;;;;;;;;;;;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>   jmp $		; 使程序悬停在此</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>   message db &quot;1 MBR&quot;</span></span>
+<span class="line"><span>   times 510-($-$$) db 0</span></span>
+<span class="line"><span>   db 0x55,0xaa</span></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h4 id="_1-section-相关" tabindex="-1"><a class="header-anchor" href="#_1-section-相关"><span>1. section 相关</span></a></h4><p>section 是伪指令，是 nasm 提供的。CPU 运行程序是不需要这个东西的，section 只是用来给程序员规划程序用的，逻辑上划分成段的好处就是方便开发人员梳理代码，方便管理。</p><p>如果没有定义 section，nasm 默认全部代码同为一个 section，起始位置为 0。</p><p><code>$</code> 表示本行代码的地址，<code>$$</code> 表示本 section 的起始地址。这两个都是 nasm 预留的关键字，是编译器安排的。</p><p><code>vstart=0x7c00</code> 表示在编译时，把起始地址编译为 <code>0x7c00</code>。</p><p>使用 nasm 进行编译这个汇编文件：<code>nasm -o mbr.bin mbr.s</code></p><p>使用 <code>bin/bximage</code> 来创建一块虚拟硬盘。然后使用 <code>dd</code> 工具将 <code>mbr.bin</code> 写入这块硬盘中。</p><p>bximage 命令创建硬盘：<code>bximage -hd -mode=&quot;flat&quot; -size=60 -q a.img</code></p><p>如下是 dd 命令的选项</p><div class="language- line-numbers-mode" data-highlighter="shiki" data-ext="" data-title="" style="--shiki-light:#24292e;--shiki-dark:#abb2bf;--shiki-light-bg:#fff;--shiki-dark-bg:#282c34;"><pre class="shiki shiki-themes github-light one-dark-pro vp-code"><code><span class="line"><span>if=FILE  // 指定要读取的文件</span></span>
+<span class="line"><span>of=FILE  // 指定要把数据输出到那个文件</span></span>
+<span class="line"><span>bs=BYTES  // 指定块的大小，dd 是以块为单位来进行 IO 操作的。此项是统一配置了输入块大小 ibs 和输出块大小 obs 的值，也可以单独配置</span></span>
+<span class="line"><span>count=BLOCKS  // 指定拷贝的块数</span></span>
+<span class="line"><span>seek=BLOCKS  // 指定当我们把块输出到文件时想要跳过多少个块</span></span>
+<span class="line"><span>conv=CONVS  // 指定如何转换文件，建议在追加数据时，conv 用 notrunc 方式，也就是不打断文件</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>dd if=/path/mbr.bin of=/path/a.img bs=512 count=1 conv=notrunc</span></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>vstart=xxx</code> 和 <code>org xxx</code> 都是告诉编译器将程序编译到 xxx 地址。</p><p>cpu 的工作原理总结如下：</p><p>控制单元要取下一条待运行的指令，该指令的地址在程序计数器 PC 中，在 x86 CPU 上，程序计数器就是 <code>cs:ip</code>。于是读取 ip 寄存器后，将此地址送上地址总线，CPU 根据此地址便得到了指令，并将其存入到指令寄存器 IR 中。这时候轮到指令译码器，根据指令格式检查指令寄存器中的指令，先确定操作码是什么，再检查操作数类型，若是在内存中，就将相应操作数从内存中取回放入自己的存储单元，若操作数是在寄存器中就直接用了。此时，操作码有了，操作数也齐了，操作控制器给运算单元下令，开工，于是运算单元便真正开始执行指令了。ip 寄存器的值被加上当前指令的大小，于是 ip 又指向了下一条指令的地址。接着控制单元又要取下一条指令了，流程回到了本段开头，CPU 便开始了日复一日的循环，由于 CPU 特别不容易坏，所以唯一它停下来的条件就是断电。</p><img src="/assets/CPU%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E7%A4%BA%E6%84%8F%E5%9B%BE-CM8PzQxn.png" style="zoom:50%;"></div><!----><footer class="vp-page-meta"><!----><div class="vp-meta-item git-info"><!----><!----></div></footer><!----><div id="vp-comment" class="giscus-wrapper input-top" style="display:block;"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" preserveAspectRatio="xMidYMid" viewBox="0 0 100 100"><circle cx="28" cy="75" r="11" fill="currentColor"><animate attributeName="fill-opacity" begin="0s" dur="1s" keyTimes="0;0.2;1" repeatCount="indefinite" values="0;1;1"></animate></circle><path fill="none" stroke="#88baf0" stroke-width="10" d="M28 47a28 28 0 0 1 28 28"><animate attributeName="stroke-opacity" begin="0.1s" dur="1s" keyTimes="0;0.2;1" repeatCount="indefinite" values="0;1;1"></animate></path><path fill="none" stroke="#88baf0" stroke-width="10" d="M28 25a50 50 0 0 1 50 50"><animate attributeName="stroke-opacity" begin="0.2s" dur="1s" keyTimes="0;0.2;1" repeatCount="indefinite" values="0;1;1"></animate></path></svg></div><!----><!--]--></main><!--]--><!----></div><!--]--><!--[--><!----><!----><!----><!--]--><!--]--></div>
+    <script type="module" src="/assets/app-D1zlwylF.js" defer></script>
+  </body>
+</html>
